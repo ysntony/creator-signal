@@ -1,5 +1,17 @@
 import { NextResponse } from "next/server";
 
+function getRunText(obj: Record<string, unknown> | undefined): string | undefined {
+  const runs = obj?.runs;
+  if (!Array.isArray(runs) || runs.length === 0) return undefined;
+  const first = runs[0];
+  return typeof first === "object" && first !== null ? (first as Record<string, unknown>).text as string | undefined : undefined;
+}
+
+function getFirstRun(obj: Record<string, unknown> | undefined): unknown {
+  const runs = obj?.runs;
+  return Array.isArray(runs) ? runs[0] : undefined;
+}
+
 type CreatorSignal = {
   name: string;
   channelId?: string;
@@ -460,7 +472,7 @@ function scoreItem(item: unknown) {
 
 function scoreArray(arr: unknown[]) {
   const slice = arr.slice(0, 20);
-  const total = slice.reduce((sum, item) => sum + scoreItem(item), 0);
+  const total = slice.reduce<number>((sum, item) => sum + scoreItem(item), 0);
   return total / Math.max(slice.length, 1);
 }
 
@@ -729,7 +741,7 @@ function extractCreatorSignals(items: unknown[]): CreatorSignal[] {
     const shortBylineText = record.shortBylineText as Record<string, unknown> | undefined;
 
     const channelRun =
-      ownerText?.runs?.[0] ?? longBylineText?.runs?.[0] ?? shortBylineText?.runs?.[0] ?? null;
+      getFirstRun(ownerText) ?? getFirstRun(longBylineText) ?? getFirstRun(shortBylineText) ?? null;
 
     const channelName = pickString(
       record.channel_name,
@@ -775,7 +787,7 @@ function extractCreatorSignals(items: unknown[]): CreatorSignal[] {
     const titleObject = record.title as Record<string, unknown> | undefined;
     const headlineObject = record.headline as Record<string, unknown> | undefined;
 
-    const titleRun = titleObject?.runs?.[0] ?? headlineObject?.runs?.[0] ?? null;
+    const titleRun = getFirstRun(titleObject) ?? getFirstRun(headlineObject) ?? null;
 
     const title = pickString(
       record.title,
@@ -794,15 +806,11 @@ function extractCreatorSignals(items: unknown[]): CreatorSignal[] {
       (record.viewCountText as Record<string, unknown>)?.simpleText as
         | string
         | undefined,
-      (record.viewCountText as Record<string, unknown>)?.runs?.[0]?.text as
-        | string
-        | undefined,
+      getRunText(record.viewCountText as Record<string, unknown> | undefined),
       (record.shortViewCountText as Record<string, unknown>)?.simpleText as
         | string
         | undefined,
-      (record.shortViewCountText as Record<string, unknown>)?.runs?.[0]?.text as
-        | string
-        | undefined
+      getRunText(record.shortViewCountText as Record<string, unknown> | undefined)
     );
     const views = toNumber(viewText);
 
@@ -880,7 +888,7 @@ function extractChannelVideoSummaries(items: unknown[], limit: number) {
     if (!videoId) continue;
 
     const titleObject = record.title as Record<string, unknown> | undefined;
-    const titleRun = titleObject?.runs?.[0] as Record<string, unknown> | undefined;
+    const titleRun = getFirstRun(titleObject) as Record<string, unknown> | undefined;
     const title = pickString(
       record.title,
       record.name,
@@ -928,8 +936,8 @@ function extractEngagementRates(items: unknown[], limit: number) {
       record.likes,
       record.likeCount,
       record.likeCountText as Record<string, unknown> | undefined,
-      record.likeCountText?.simpleText as string | undefined,
-      record.likeCountText?.runs?.[0]?.text as string | undefined
+      (record.likeCountText as Record<string, unknown> | undefined)?.simpleText as string | undefined,
+      getRunText(record.likeCountText as Record<string, unknown> | undefined)
     );
 
     const comments = pickCount(
@@ -937,8 +945,8 @@ function extractEngagementRates(items: unknown[], limit: number) {
       record.comments,
       record.commentCount,
       record.commentCountText as Record<string, unknown> | undefined,
-      record.commentCountText?.simpleText as string | undefined,
-      record.commentCountText?.runs?.[0]?.text as string | undefined
+      (record.commentCountText as Record<string, unknown> | undefined)?.simpleText as string | undefined,
+      getRunText(record.commentCountText as Record<string, unknown> | undefined)
     );
 
     if (likes == null && comments == null) continue;
