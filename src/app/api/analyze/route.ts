@@ -1302,8 +1302,8 @@ export async function POST(request: Request) {
     const searchPath = process.env.TIKHUB_SEARCH_PATH ?? DEFAULTS.searchPath;
     const searchQueryParam =
       process.env.TIKHUB_SEARCH_QUERY_PARAM ?? DEFAULTS.searchQueryParam;
-    const keyHeader = process.env.TIKHUB_API_KEY_HEADER ?? DEFAULTS.keyHeader;
-    const keyPrefix = process.env.TIKHUB_API_KEY_PREFIX ?? DEFAULTS.keyPrefix;
+    const keyHeader = (process.env.TIKHUB_API_KEY_HEADER ?? DEFAULTS.keyHeader).trim();
+    const keyPrefix = (process.env.TIKHUB_API_KEY_PREFIX ?? DEFAULTS.keyPrefix).trim();
     const searchMethod =
       (process.env.TIKHUB_SEARCH_METHOD ?? DEFAULTS.searchMethod).toUpperCase();
     const channelVideosPath =
