@@ -1299,24 +1299,20 @@ export async function POST(request: Request) {
       });
     }
 
-    const searchPath = process.env.TIKHUB_SEARCH_PATH ?? DEFAULTS.searchPath;
-    const searchQueryParam =
-      process.env.TIKHUB_SEARCH_QUERY_PARAM ?? DEFAULTS.searchQueryParam;
-    const keyHeader = (process.env.TIKHUB_API_KEY_HEADER ?? DEFAULTS.keyHeader).trim();
-    const keyPrefix = (process.env.TIKHUB_API_KEY_PREFIX ?? DEFAULTS.keyPrefix).trim();
+    const env = (key: string) => process.env[key]?.trim();
+    const searchPath = env("TIKHUB_SEARCH_PATH") ?? DEFAULTS.searchPath;
+    const searchQueryParam = env("TIKHUB_SEARCH_QUERY_PARAM") ?? DEFAULTS.searchQueryParam;
+    const keyHeader = env("TIKHUB_API_KEY_HEADER") ?? DEFAULTS.keyHeader;
+    const keyPrefix = env("TIKHUB_API_KEY_PREFIX") ?? DEFAULTS.keyPrefix;
     const searchMethod =
-      (process.env.TIKHUB_SEARCH_METHOD ?? DEFAULTS.searchMethod).toUpperCase();
-    const channelVideosPath =
-      process.env.TIKHUB_CHANNEL_VIDEOS_PATH ?? DEFAULTS.channelVideosPath;
-    const channelIdParam =
-      process.env.TIKHUB_CHANNEL_ID_PARAM ?? DEFAULTS.channelIdParam;
+      (env("TIKHUB_SEARCH_METHOD") ?? DEFAULTS.searchMethod).toUpperCase();
+    const channelVideosPath = env("TIKHUB_CHANNEL_VIDEOS_PATH") ?? DEFAULTS.channelVideosPath;
+    const channelIdParam = env("TIKHUB_CHANNEL_ID_PARAM") ?? DEFAULTS.channelIdParam;
     const channelVideosLimitRaw =
-      process.env.TIKHUB_CHANNEL_VIDEOS_LIMIT ??
-      DEFAULTS.channelVideosLimit.toString();
+      env("TIKHUB_CHANNEL_VIDEOS_LIMIT") ?? DEFAULTS.channelVideosLimit.toString();
     const channelVideosLimit = Number(channelVideosLimitRaw) || DEFAULTS.channelVideosLimit;
-    const videoInfoPath =
-      process.env.TIKHUB_VIDEO_INFO_PATH ?? DEFAULTS.videoInfoPath;
-    const videoIdParam = process.env.TIKHUB_VIDEO_ID_PARAM ?? DEFAULTS.videoIdParam;
+    const videoInfoPath = env("TIKHUB_VIDEO_INFO_PATH") ?? DEFAULTS.videoInfoPath;
+    const videoIdParam = env("TIKHUB_VIDEO_ID_PARAM") ?? DEFAULTS.videoIdParam;
     const engagementSampleRaw =
       process.env.TIKHUB_ENGAGEMENT_SAMPLE ??
       channelVideosLimit.toString();
